@@ -19,6 +19,22 @@ const clientJobData = {
     ]
 };
 
+// Dummy data for talents
+const dummyTalentData = {
+    'Software Engineer': [
+        { name: 'Umesh Khan', contractDuration: '12 months', billRate: '100', currency: 'USD', standardTimeBR: '90', overtimeBR: '120' },
+        { name: 'Ravi Sharma', contractDuration: '6 months', billRate: '80', currency: 'USD', standardTimeBR: '70', overtimeBR: '100' }
+    ],
+    'Product Manager': [
+        { name: 'Priya Patel', contractDuration: '18 months', billRate: '120', currency: 'USD', standardTimeBR: '110', overtimeBR: '130' },
+        { name: 'Amit Mehta', contractDuration: '9 months', billRate: '95', currency: 'USD', standardTimeBR: '85', overtimeBR: '105' }
+    ],
+    'Data Analyst': [
+        { name: 'Sunil Gupta', contractDuration: '10 months', billRate: '85', currency: 'USD', standardTimeBR: '75', overtimeBR: '95' },
+        { name: 'Kiran Verma', contractDuration: '7 months', billRate: '70', currency: 'USD', standardTimeBR: '65', overtimeBR: '85' }
+    ]
+};
+
 function App() {
     const [formData, setFormData] = useState({
         clientName: '',
@@ -36,6 +52,7 @@ function App() {
 
     const [jobOptions, setJobOptions] = useState([]);
     const [isViewMode, setIsViewMode] = useState(false);
+    const [checkedTalents, setCheckedTalents] = useState({}); // Track checked status of talents
 
     useEffect(() => {
         if (formData.clientName) {
@@ -72,6 +89,9 @@ function App() {
                         if (name === 'jobTitle') {
                             const selectedJob = jobOptions.find(option => option.jobTitle === value);
                             updatedJob.reqId = selectedJob ? selectedJob.reqId : '';
+
+                            // Populate talents with dummy data based on job title
+                            updatedJob.talents = dummyTalentData[value] || [{ contractDuration: '', billRate: '', currency: 'USD', standardTimeBR: '', overtimeBR: '' }];
                         }
                         return updatedJob;
                     }
@@ -83,6 +103,14 @@ function App() {
             // Update form-level fields
             setFormData({ ...formData, [name]: value });
         }
+    };
+
+    const handleCheckboxChange = (e, jobIndex, talentIndex) => {
+        const { checked } = e.target;
+        setCheckedTalents({
+            ...checkedTalents,
+            [`${jobIndex}-${talentIndex}`]: checked
+        });
     };
 
     const handleDateChange = (name, date) => {
@@ -126,12 +154,13 @@ function App() {
             currency: 'USD',
             jobDetails: [{ jobTitle: '', reqId: '', talents: [{ contractDuration: '', billRate: '', currency: 'USD', standardTimeBR: '', overtimeBR: '' }] }]
         });
+        setCheckedTalents({});
         setIsViewMode(false);
     };
 
     return (
         <div className="container-fluid">
-            <h2>{isViewMode ? 'View Details' : 'Purchase Order Form'}</h2>
+            <h2 className='text-center my-5 ' style={{ backgroundColor: 'green', color: 'white' }}>{isViewMode ? 'View Details' : 'Purchase Order Form'}</h2>
             <form onSubmit={handleSubmit}>
                 {!isViewMode ? (
                     <>
@@ -151,8 +180,11 @@ function App() {
                             handleDateChange={handleDateChange}
                             addJobDetail={addJobDetail}
                             removeJobDetail={removeJobDetail}
+                            checkedTalents={checkedTalents}
+                            handleCheckboxChange={handleCheckboxChange}
+                            formData={formData}
                         />
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                             <button type="submit" className="btn btn-outline-dark rounded-pill">Save</button>
                             <button type="button" className="btn btn-light btn-outline-dark rounded-pill" onClick={handleReset}>Reset</button>
                         </div>
@@ -179,13 +211,14 @@ function App() {
                                     <p><strong>REQ ID:</strong> {job.reqId}</p>
                                     <h6>Talents</h6>
                                     {job.talents.map((talent, talentIndex) => (
-                                        <div key={talentIndex} className="mb-3">
-                                            <p><strong>Talent #{talentIndex + 1}</strong></p>
-                                            <p><strong>Contract Duration:</strong> {talent.contractDuration}</p>
-                                            <p><strong>Bill Rate:</strong> {talent.billRate}</p>
-                                            <p><strong>Currency:</strong> {talent.currency}</p>
-                                            <p><strong>Standard Time Bill Rate:</strong> {talent.standardTimeBR}</p>
-                                            <p><strong>Overtime Bill Rate:</strong> {talent.overtimeBR}</p>
+                                        <div key={talentIndex} className="mb-2">
+                                            <input
+                                                type="checkbox"
+                                                id={`talent-${jobIndex}-${talentIndex}`}
+                                                checked={!!checkedTalents[`${jobIndex}-${talentIndex}`]}
+                                                onChange={(e) => handleCheckboxChange(e, jobIndex, talentIndex)}
+                                            />
+                                            <label htmlFor={`talent-${jobIndex}-${talentIndex}`} className="ms-2">{talent.name}</label>
                                         </div>
                                     ))}
                                 </div>
@@ -201,3 +234,4 @@ function App() {
 }
 
 export default App;
+

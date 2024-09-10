@@ -1,7 +1,7 @@
 import React from 'react';
 import TalentDetails from './TalentDetails';
 
-function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobDetail, removeJobDetail }) {
+function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobDetail, removeJobDetail, checkedTalents, handleCheckboxChange }) {
     return (
         <div>
             <div className="row align-items-center my-3 bg-light text-dark">
@@ -22,7 +22,7 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                     <div className="card-body">
                         <h5 className="card-title">Job Detail #{jobIndex + 1}</h5>
                         <div className="row">
-                            <div className="col-md-6">
+                            <div className="col-md-3">
                                 <div className="mb-3">
                                     <label>Job Title/REQ Name <span style={{ color: 'red' }}>*</span></label>
                                     <select
@@ -40,7 +40,7 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                     </select>
                                 </div>
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-3">
                                 <div className="mb-3">
                                     <label>REQ ID <span style={{ color: 'red' }}>*</span></label>
                                     <input
@@ -63,6 +63,8 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                 talentIndex={talentIndex}
                                 jobIndex={jobIndex}
                                 handleInputChange={handleInputChange}
+                                isChecked={!!checkedTalents[`${jobIndex}-${talentIndex}`]} // Pass checked status
+                                handleCheckboxChange={handleCheckboxChange} // Pass the handleCheckboxChange function
                             />
                         ))}
 
