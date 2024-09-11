@@ -8,14 +8,12 @@ const clientJobData = {
     Client1: [
         { jobTitle: 'Software Engineer', reqId: 'REQ123' },
         { jobTitle: 'Product Manager', reqId: 'REQ124' },
-        { jobTitle: 'Software Developer', reqId: 'REQ127' },
-        { jobTitle: 'Android Developer', reqId: 'REQ128' }
+        { jobTitle: 'Data Analyst', reqId: 'REQ125' },
     ],
     Client2: [
+        { jobTitle: 'Software Engineer', reqId: 'REQ123' },
+        { jobTitle: 'Product Manager', reqId: 'REQ124' },
         { jobTitle: 'Data Analyst', reqId: 'REQ125' },
-        { jobTitle: 'UX Designer', reqId: 'REQ126' },
-        { jobTitle: 'Software Developer', reqId: 'REQ129' },
-        { jobTitle: 'Android Developer', reqId: 'REQ130' }
     ]
 };
 
@@ -52,7 +50,8 @@ function App() {
 
     const [jobOptions, setJobOptions] = useState([]);
     const [isViewMode, setIsViewMode] = useState(false);
-    const [checkedTalents, setCheckedTalents] = useState({}); // Track checked status of talents
+    const [checkedTalents, setCheckedTalents] = useState({}); 
+    const [loading, setLoading] = useState(false); 
 
     useEffect(() => {
         if (formData.clientName) {
@@ -100,7 +99,6 @@ function App() {
                 setFormData({ ...formData, jobDetails: updatedJobDetails });
             }
         } else {
-            // Update form-level fields
             setFormData({ ...formData, [name]: value });
         }
     };
@@ -113,9 +111,13 @@ function App() {
         });
     };
 
-    const handleDateChange = (name, date) => {
-        setFormData({ ...formData, [name]: date });
+    const handleDateChange = (name, value) => {
+        setFormData({
+            ...formData,
+            [name]: new Date(value)
+        });
     };
+    
 
     const addJobDetail = () => {
         setFormData({
@@ -133,8 +135,36 @@ function App() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setIsViewMode(true);
+    
+        // Validate talent selection
+        let isValid = true;
+        let errorMessage = '';
+    
+        formData.jobDetails.forEach((job, jobIndex) => {
+            const selectedTalents = job.talents.filter((_, talentIndex) => checkedTalents[`${jobIndex}-${talentIndex}`]);
+    
+            if (formData.poType === 'Individual PO' && selectedTalents.length !== 1) {
+                isValid = false;
+                errorMessage = 'Individual PO requires exactly one talent to be selected.';
+            } else if (formData.poType === 'Group PO' && selectedTalents.length < 2) {
+                isValid = false;
+                errorMessage = 'Group PO requires at least two talents to be selected.';
+            }
+        });
+    
+        if (!isValid) {
+            alert(errorMessage);
+            return;
+        }
+    
+        setLoading(true);
+    
+        setTimeout(() => {
+            setLoading(false);
+            setIsViewMode(true); 
+        }, 1000);
     };
+    
 
     const handleEdit = () => {
         setIsViewMode(false);
@@ -160,7 +190,17 @@ function App() {
 
     return (
         <div className="container-fluid">
-            <h2 className='text-center my-5 ' style={{ backgroundColor: 'green', color: 'white' }}>{isViewMode ? 'View Details' : 'Purchase Order Form'}</h2>
+            <h2 className="text-center my-5 p-3" style={{ backgroundColor: 'green', color: 'white' }}>
+                {isViewMode ? 'View Details' : 'Purchase Order Form'}
+            </h2>
+
+            {/* AJAX-like loading */}
+            {loading && (
+                <div className="alert alert-info text-center" role="alert">
+                    Saving data...
+                </div>
+            )}
+
             <form onSubmit={handleSubmit}>
                 {!isViewMode ? (
                     <>
@@ -170,7 +210,7 @@ function App() {
                             handleInputChange={handleInputChange}
                             handleDateChange={handleDateChange}
                         />
-
+    
                         {/* Job Details */}
                         <JobDetails
                             jobDetails={formData.jobDetails}
@@ -184,53 +224,92 @@ function App() {
                             handleCheckboxChange={handleCheckboxChange}
                             formData={formData}
                         />
-                        <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" className="btn btn-outline-dark rounded-pill">Save</button>
-                            <button type="button" className="btn btn-light btn-outline-dark rounded-pill" onClick={handleReset}>Reset</button>
+    
+                        <div className="d-grid gap-2 d-md-flex justify-content-md-end my-3">
+                            <button type="submit" className="btn btn-outline-dark rounded-pill me-2" disabled={loading}>
+                                {loading ? 'Saving...' : 'Save'}
+                            </button>
+                            <button type="button" className="btn btn-light btn-outline-dark rounded-pill" onClick={handleReset}>
+                                Reset
+                            </button>
                         </div>
                     </>
                 ) : (
-                    <div>
-                        {/* Display Form Data */}
-                        <h4>Client Name: {formData.clientName}</h4>
-                        <h4>PO Type: {formData.poType}</h4>
-                        <h4>PO Number: {formData.poNumber}</h4>
-                        <h4>Received On: {formData.receivedOn.toDateString()}</h4>
-                        <h4>Received From: {formData.receivedFromName} ({formData.receivedFromEmail})</h4>
-                        <h4>PO Start Date: {formData.poStartDate.toDateString()}</h4>
-                        <h4>PO End Date: {formData.poEndDate.toDateString()}</h4>
-                        <h4>Budget: {formData.budget}</h4>
-                        <h4>Currency: {formData.currency}</h4>
-
-                        <h3>Talent Details</h3>
+                    <div className="bg-light p-4 rounded shadow-sm">
+                        <h4 className="text-primary mb-4">Client & Purchase Order Details</h4>
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <strong>Client Name:</strong> {formData.clientName}
+                            </div>
+                            <div className="col-md-6">
+                                <strong>PO Type:</strong> {formData.poType}
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <strong>PO Number:</strong> {formData.poNumber}
+                            </div>
+                            <div className="col-md-6">
+                                <strong>Received On:</strong> {new Date(formData.receivedOn).toDateString()}
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <strong>Received From:</strong> {formData.receivedFromName} ({formData.receivedFromEmail})
+                            </div>
+                            <div className="col-md-6">
+                                <strong>PO Start Date:</strong> {new Date(formData.poStartDate).toDateString()}
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <strong>PO End Date:</strong> {new Date(formData.poEndDate).toDateString()}
+                            </div>
+                            <div className="col-md-6">
+                                <strong>Budget:</strong> ${formData.budget}
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <strong>Currency:</strong> {formData.currency}
+                        </div>
+    
+                        <h4 className="text-primary mt-5 mb-4">Talent Details</h4>
                         {formData.jobDetails.map((job, jobIndex) => (
                             <div key={jobIndex} className="card my-2">
                                 <div className="card-body">
-                                    <h5 className="card-title">Job Detail #{jobIndex + 1}</h5>
+                                    <h5 className="card-title text-info">Job Detail #{jobIndex + 1}</h5>
                                     <p><strong>Job Title:</strong> {job.jobTitle}</p>
                                     <p><strong>REQ ID:</strong> {job.reqId}</p>
-                                    <h6>Talents</h6>
+                                    
+                                    <h6 className="mt-4">Talents</h6>
                                     {job.talents.map((talent, talentIndex) => (
-                                        <div key={talentIndex} className="mb-2">
-                                            <input
-                                                type="checkbox"
-                                                id={`talent-${jobIndex}-${talentIndex}`}
-                                                checked={!!checkedTalents[`${jobIndex}-${talentIndex}`]}
-                                                onChange={(e) => handleCheckboxChange(e, jobIndex, talentIndex)}
-                                            />
-                                            <label htmlFor={`talent-${jobIndex}-${talentIndex}`} className="ms-2">{talent.name}</label>
-                                        </div>
+                                        checkedTalents[`${jobIndex}-${talentIndex}`] && ( 
+                                            <div key={talentIndex} className="mb-3">
+                                                <strong>{talent.name}</strong>
+                                                <ul className="list-unstyled">
+                                                    <li><strong>Contract Duration:</strong> {talent.contractDuration}</li>
+                                                    <li><strong>Bill Rate:</strong> ${talent.billRate}</li>
+                                                    <li><strong>Currency:</strong> {talent.currency}</li>
+                                                    <li><strong>Standard Time Bill Rate:</strong> ${talent.standardTimeBR}</li>
+                                                    <li><strong>Overtime Bill Rate:</strong> ${talent.overtimeBR}</li>
+                                                </ul>
+                                            </div>
+                                        )
                                     ))}
                                 </div>
                             </div>
                         ))}
-
-                        <button type="button" className="btn btn-primary" onClick={handleEdit}>Edit</button>
+    
+                        <div className="d-flex justify-content-end mt-4">
+                            <button type="button" className="btn btn-primary" onClick={handleEdit}>Edit</button>
+                        </div>
                     </div>
                 )}
             </form>
         </div>
     );
+    
+    
 }
 
 export default App;
