@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-datepicker/dist/react-datepicker.css';
 import ClientDetails from './components/ClientDetails';
 import JobDetails from './components/JobDetails';
 
