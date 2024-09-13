@@ -293,8 +293,10 @@ function App() {
                                                         <li><strong>Bill Rate:</strong> <span className="text-muted">${talent.billRate}</span></li>
                                                         <li><strong>Currency:</strong> <span className="text-muted">{talent.currency}</span></li>
                                                         <li><strong>Standard Time Bill Rate:</strong> <span className="text-muted">${talent.standardTimeBR}</span></li>
+                                                        <li><strong>Currency:</strong> <span className="text-muted">{talent.currency}</span></li>
                                                         <li><strong>Overtime Bill Rate:</strong> <span className="text-muted">${talent.overtimeBR}</span></li>
-                                                    </ul>
+                                                        <li><strong>Currency:</strong> <span className="text-muted">{talent.currency}</span></li>
+                                                        </ul>
                                                 </div>
                                             </div>
                                         )
