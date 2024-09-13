@@ -34,6 +34,14 @@ const dummyTalentData = {
     ]
 };
 
+
+const currencySymbols = {
+    USD: { symbol: '$', position: 'before' },
+    EUR: { symbol: '€', position: 'before' },
+    INR: { symbol: '₹', position: 'before' },
+};
+
+
 function App() {
     const [formData, setFormData] = useState({
         clientName: '',
@@ -264,10 +272,22 @@ function App() {
                             <div className="col-md-6">
                                 <strong>PO End Date:</strong> {new Date(formData.poEndDate).toDateString()}
                             </div>
-                            <div className="col-md-6">
-                                <strong>Budget:</strong> ${formData.budget}
-                            </div>
+
                         </div>
+                        <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <strong>Budget: </strong>
+                                    {currencySymbols[formData.currency]?.position === 'before' && (
+                                        <span style={{ marginRight: '5px' }}>{currencySymbols[formData.currency].symbol}</span>
+                                    )}
+                                    <span>{formData.budget}</span>
+                                    {currencySymbols[formData.currency]?.position === 'after' && (
+                                        <span style={{ marginLeft: '5px' }}>{currencySymbols[formData.currency].symbol}</span>
+                                    )}
+                                </div>
+
+                        </div>
+
                         <div className="mb-3">
                             <strong>Currency:</strong> {formData.currency}
                         </div>
@@ -289,14 +309,41 @@ function App() {
                                                 <strong className="d-block mb-2">{talent.name}</strong>
                                                 <div className="bg-light p-3 rounded">
                                                     <ul className="list-unstyled mb-0">
-                                                        <li><strong>Contract Duration:</strong> <span className="text-muted">{talent.contractDuration}</span></li>
-                                                        <li><strong>Bill Rate:</strong> <span className="text-muted">${talent.billRate}</span></li>
-                                                        <li><strong>Currency:</strong> <span className="text-muted">{talent.currency}</span></li>
-                                                        <li><strong>Standard Time Bill Rate:</strong> <span className="text-muted">${talent.standardTimeBR}</span></li>
-                                                        <li><strong>Currency:</strong> <span className="text-muted">{talent.currency}</span></li>
-                                                        <li><strong>Overtime Bill Rate:</strong> <span className="text-muted">${talent.overtimeBR}</span></li>
-                                                        <li><strong>Currency:</strong> <span className="text-muted">{talent.currency}</span></li>
-                                                        </ul>
+                                                        <li>
+                                                            <strong>Contract Duration:</strong>
+                                                            <span className="text-muted"> {talent.contractDuration}</span>
+                                                        </li>
+                                                        <li>
+                                                            <strong>Bill Rate:</strong>
+                                                            {currencySymbols[talent.currency]?.position === 'before' && (
+                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
+                                                            )}
+                                                            <span className="text-muted"> {talent.billRate}</span>
+                                                            {currencySymbols[talent.currency]?.position === 'after' && (
+                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
+                                                            )}
+                                                        </li>
+                                                        <li>
+                                                            <strong>Standard Time Bill Rate:</strong>
+                                                            {currencySymbols[talent.currency]?.position === 'before' && (
+                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
+                                                            )}
+                                                            <span className="text-muted"> {talent.standardTimeBR}</span>
+                                                            {currencySymbols[talent.currency]?.position === 'after' && (
+                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
+                                                            )}
+                                                        </li>
+                                                        <li>
+                                                            <strong>Overtime Bill Rate:</strong>
+                                                            {currencySymbols[talent.currency]?.position === 'before' && (
+                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
+                                                            )}
+                                                            <span className="text-muted"> {talent.overtimeBR}</span>
+                                                            {currencySymbols[talent.currency]?.position === 'after' && (
+                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
+                                                            )}
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         )
@@ -304,6 +351,7 @@ function App() {
                                 </div>
                             </div>
                         ))}
+
 
                         <div className="d-flex justify-content-end mt-4">
                             <button type="button" className="btn btn-primary" onClick={handleEdit}>Back</button>

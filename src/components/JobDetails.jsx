@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TalentDetails from './TalentDetails';
 
 function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobDetail, removeJobDetail, checkedTalents, handleCheckboxChange }) {
+    const [showModal, setShowModal] = useState(false); // State to control modal visibility
+    const [jobToDelete, setJobToDelete] = useState(null); // Store the index of the job to be deleted
+
+    // Function to show the modal
+    const handleDeleteClick = (jobIndex) => {
+        setJobToDelete(jobIndex);
+        setShowModal(true); // Show modal on delete icon click
+    };
+
+    // Function to confirm deletion
+    const confirmDelete = () => {
+        if (jobToDelete !== null) {
+            removeJobDetail(jobToDelete);
+        }
+        setShowModal(false); // Close the modal after deletion
+    };
+
     return (
         <div>
+            {/* Talent Details Heading */}
             <div className="row align-items-center my-3 bg-light text-dark">
                 <div className="col mx-3">
                     <h2>Talent Details</h2>
@@ -17,10 +35,10 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                 </div>
             </div>
 
+            {/* Job Details */}
             {jobDetails.map((job, jobIndex) => (
                 <div key={jobIndex} className="card my-2">
                     <div className="card-body">
-
                         <div className="row align-items-center">
                             <div className="col-md-3">
                                 <div className="mb-3">
@@ -63,7 +81,7 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                             fontSize: '1.5rem',
                                             marginRight: '10px'
                                         }}
-                                        onClick={() => removeJobDetail(jobIndex)}
+                                        onClick={() => handleDeleteClick(jobIndex)}  // Show modal on delete click
                                     ></i>
                                 )}
                             </div>
@@ -81,11 +99,34 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                 handleCheckboxChange={handleCheckboxChange} 
                             />
                         ))}
-
-
                     </div>
                 </div>
             ))}
+
+            {/* Bootstrap Modal for Delete Confirmation */}
+            {showModal && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Confirm Deletion</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Are you sure you want to delete?</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                    Cancel
+                                </button>
+                                <button type="button" className="btn btn-danger" onClick={confirmDelete}>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
