@@ -4,11 +4,9 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
     return (
         <div className="mb-3">
             <div className="row">
-                {/* Render talent details only if the jobTitle is selected */}
                 {talent.name && (
                     <>
                         <div className="col-md-12">
-                            {/* Checkbox and Talent Name */}
                             <h6>
                                 <input
                                     type="checkbox"
@@ -17,11 +15,12 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                     checked={isChecked}
                                     onChange={(e) => handleCheckboxChange(e, jobIndex, talentIndex)}
                                 />{' '}
-                                {talent.name} {/* Show Talent Name */}
+                                {talent.name} 
                             </h6>
                         </div>
 
                         {/* Talent Details */}
+                        
                         <div className="col-md-2">
                             <div className="mb-2">
                                 <label>Contract Duration</label>
@@ -32,7 +31,7 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                     placeholder="Contract Duration"
                                     value={talent.contractDuration}
                                     onChange={(e) => handleInputChange(e, jobIndex, talentIndex)}
-                                    disabled={!isChecked} // Disable input if checkbox is not checked
+                                    disabled={!isChecked} 
                                 />
                             </div>
                         </div>
@@ -46,19 +45,19 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                     placeholder="Bill Rate"
                                     value={talent.billRate}
                                     onChange={(e) => handleInputChange(e, jobIndex, talentIndex)}
-                                    disabled={!isChecked} // Disable input if checkbox is not checked
+                                    disabled={!isChecked} 
                                 />
                             </div>
                         </div>
                         <div className="col-md-2">
                             <div className="mb-2">
-                                <label>Currency<span style={{ color: 'red' }}>*</span></label>
+                                <label>Currency</label>
                                 <select
                                     name="currency"
                                     className="form-select"
                                     value={talent.currency}
                                     onChange={(e) => handleInputChange(e, jobIndex, talentIndex)}
-                                    disabled={!isChecked} // Disable input if checkbox is not checked
+                                    disabled={!isChecked} 
                                     required
                                 >
                                     <option value="USD">USD - Dollars($)</option>
@@ -77,8 +76,25 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                     placeholder="Std. Time BR"
                                     value={talent.standardTimeBR}
                                     onChange={(e) => handleInputChange(e, jobIndex, talentIndex)}
-                                    disabled={!isChecked} // Disable input if checkbox is not checked
+                                    disabled={!isChecked} 
                                 />
+                            </div>
+                        </div>
+                        <div className="col-md-2">
+                            <div className="mb-2">
+                                <label>Currency</label>
+                                <select
+                                    name="currency"
+                                    className="form-select"
+                                    value={talent.currency}
+                                    onChange={(e) => handleInputChange(e, jobIndex, talentIndex)}
+                                    disabled={!isChecked} 
+                                    required
+                                >
+                                    <option value="USD">USD - Dollars($)</option>
+                                    <option value="EUR">Euro</option>
+                                    <option value="INR">INR</option>
+                                </select>
                             </div>
                         </div>
                         <div className="col-md-2">
@@ -91,8 +107,25 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                     placeholder="Overtime BR"
                                     value={talent.overtimeBR}
                                     onChange={(e) => handleInputChange(e, jobIndex, talentIndex)}
-                                    disabled={!isChecked} // Disable input if checkbox is not checked
+                                    disabled={!isChecked} 
                                 />
+                            </div>
+                        </div>
+                        <div className="col-md-2">
+                            <div className="mb-2">
+                                <label>Currency</label>
+                                <select
+                                    name="currency"
+                                    className="form-select"
+                                    value={talent.currency}
+                                    onChange={(e) => handleInputChange(e, jobIndex, talentIndex)}
+                                    disabled={!isChecked} 
+                                    required
+                                >
+                                    <option value="USD">USD - Dollars($)</option>
+                                    <option value="EUR">Euro</option>
+                                    <option value="INR">INR</option>
+                                </select>
                             </div>
                         </div>
                     </>

@@ -20,8 +20,8 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
             {jobDetails.map((job, jobIndex) => (
                 <div key={jobIndex} className="card my-2">
                     <div className="card-body">
-                        <h5 className="card-title">Job Detail #{jobIndex + 1}</h5>
-                        <div className="row">
+
+                        <div className="row align-items-center">
                             <div className="col-md-3">
                                 <div className="mb-3">
                                     <label>Job Title/REQ Name <span style={{ color: 'red' }}>*</span></label>
@@ -53,6 +53,20 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                     />
                                 </div>
                             </div>
+
+                            <div className="col-md-6 d-flex justify-content-end">
+                                {poType === 'Group PO' && (
+                                    <i
+                                        className="fas fa-trash-alt text-danger"
+                                        style={{
+                                            cursor: 'pointer',
+                                            fontSize: '1.5rem',
+                                            marginRight: '10px'
+                                        }}
+                                        onClick={() => removeJobDetail(jobIndex)}
+                                    ></i>
+                                )}
+                            </div>
                         </div>
 
                         {/* Talent Details */}
@@ -63,16 +77,12 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                 talentIndex={talentIndex}
                                 jobIndex={jobIndex}
                                 handleInputChange={handleInputChange}
-                                isChecked={!!checkedTalents[`${jobIndex}-${talentIndex}`]} // Pass checked status
-                                handleCheckboxChange={handleCheckboxChange} // Pass the handleCheckboxChange function
+                                isChecked={!!checkedTalents[`${jobIndex}-${talentIndex}`]} 
+                                handleCheckboxChange={handleCheckboxChange} 
                             />
                         ))}
 
-                        {poType === 'Group PO' && (
-                            <button type="button" className="btn btn-danger" onClick={() => removeJobDetail(jobIndex)}>
-                                Remove Job Detail
-                            </button>
-                        )}
+
                     </div>
                 </div>
             ))}
