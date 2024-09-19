@@ -4,7 +4,6 @@ import ClientDetails from './components/ClientDetails';
 import JobDetails from './components/JobDetails';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-
 const clientJobData = {
     Client1: [
         { jobTitle: 'Software Engineer', reqId: 'REQ123' },
@@ -18,29 +17,26 @@ const clientJobData = {
     ]
 };
 
-// Dummy data for talents
 const dummyTalentData = {
     'Software Engineer': [
-        { name: 'Umesh Khan', contractDuration: '12 months', billRate: '100', currency: 'USD', standardTimeBR: '90', currency: 'USD', overtimeBR: '120', currency: 'USD' },
-        { name: 'Ravi Sharma', contractDuration: '6 months', billRate: '80', currency: 'USD', standardTimeBR: '70', currency: 'USD', overtimeBR: '100', currency: 'USD' }
+        { name: 'Umesh Khan', contractDuration: '12 months', billRate: '100', currency: 'USD', standardTimeBR: '90', overtimeBR: '120' },
+        { name: 'Ravi Sharma', contractDuration: '6 months', billRate: '80', currency: 'USD', standardTimeBR: '70', overtimeBR: '100' }
     ],
     'Product Manager': [
-        { name: 'Priya Patel', contractDuration: '18 months', billRate: '120', currency: 'USD', standardTimeBR: '110', currency: 'USD', overtimeBR: '130', currency: 'USD' },
-        { name: 'Amit Mehta', contractDuration: '9 months', billRate: '95', currency: 'USD', standardTimeBR: '85', currency: 'USD', overtimeBR: '105', currency: 'USD' }
+        { name: 'Priya Patel', contractDuration: '18 months', billRate: '120', currency: 'USD', standardTimeBR: '110', overtimeBR: '130' },
+        { name: 'Amit Mehta', contractDuration: '9 months', billRate: '95', currency: 'USD', standardTimeBR: '85', overtimeBR: '105' }
     ],
     'Data Analyst': [
-        { name: 'Sunil Gupta', contractDuration: '10 months', billRate: '85', currency: 'USD', standardTimeBR: '75', currency: 'USD', overtimeBR: '95', currency: 'USD' },
-        { name: 'Kiran Verma', contractDuration: '7 months', billRate: '70', currency: 'USD', standardTimeBR: '65', currency: 'USD', overtimeBR: '85', currency: 'USD' }
+        { name: 'Sunil Gupta', contractDuration: '10 months', billRate: '85', currency: 'USD', standardTimeBR: '75', overtimeBR: '95' },
+        { name: 'Kiran Verma', contractDuration: '7 months', billRate: '70', currency: 'USD', standardTimeBR: '65', overtimeBR: '85' }
     ]
 };
-
 
 const currencySymbols = {
     USD: { symbol: '$', position: 'before' },
     EUR: { symbol: '€', position: 'before' },
     INR: { symbol: '₹', position: 'before' },
 };
-
 
 function App() {
     const [formData, setFormData] = useState({
@@ -54,7 +50,7 @@ function App() {
         poEndDate: new Date(),
         budget: '',
         currency: 'USD',
-        jobDetails: [{ jobTitle: '', reqId: '', talents: [{ contractDuration: '', billRate: '', currency: 'USD', standardTimeBR: '', currency: 'USD', overtimeBR: '', currency: 'USD' }] }]
+        jobDetails: [{ jobTitle: '', reqId: '', talents: [{ contractDuration: '', billRate: '', currency: 'USD', standardTimeBR: '', overtimeBR: '' }] }]
     });
 
     const [jobOptions, setJobOptions] = useState([]);
@@ -75,7 +71,6 @@ function App() {
 
         if (jobIndex !== null) {
             if (talentIndex !== null) {
-                // Update talent-specific fields
                 const updatedJobDetails = formData.jobDetails.map((job, jIndex) => {
                     if (jIndex === jobIndex) {
                         const updatedTalents = job.talents.map((talent, tIndex) => {
@@ -90,7 +85,6 @@ function App() {
                 });
                 setFormData({ ...formData, jobDetails: updatedJobDetails });
             } else {
-                // Update job-specific fields and generate REQ ID if jobTitle changes
                 const updatedJobDetails = formData.jobDetails.map((job, index) => {
                     if (index === jobIndex) {
                         const updatedJob = { ...job, [name]: value };
@@ -119,12 +113,18 @@ function App() {
     };
 
     const handleDateChange = (name, value) => {
+        const newDate = new Date(value);
+        if (name === 'poEndDate' && newDate < formData.poStartDate) {
+            alert("End date cannot be before the start date.");
+            return; 
+        }
+        
         setFormData({
             ...formData,
-            [name]: new Date(value)
+            [name]: newDate
         });
     };
-
+    
 
     const addJobDetail = () => {
         setFormData({
@@ -142,36 +142,12 @@ function App() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Validate talent selection
-        let isValid = true;
-        let errorMessage = '';
-
-        formData.jobDetails.forEach((job, jobIndex) => {
-            const selectedTalents = job.talents.filter((_, talentIndex) => checkedTalents[`${jobIndex}-${talentIndex}`]);
-
-            if (formData.poType === 'Individual PO' && selectedTalents.length !== 1) {
-                isValid = false;
-                errorMessage = 'Individual PO requires exactly one talent to be selected.';
-            } else if (formData.poType === 'Group PO' && selectedTalents.length < 2) {
-                isValid = false;
-                errorMessage = 'Group PO requires at least two talents to be selected.';
-            }
-        });
-
-        if (!isValid) {
-            alert(errorMessage);
-            return;
-        }
-
         setLoading(true);
-
         setTimeout(() => {
             setLoading(false);
             setIsViewMode(true);
         }, 1000);
     };
-
 
     const handleEdit = () => {
         setIsViewMode(false);
@@ -189,7 +165,7 @@ function App() {
             poEndDate: new Date(),
             budget: '',
             currency: 'USD',
-            jobDetails: [{ jobTitle: '', reqId: '', talents: [{ contractDuration: '', billRate: '', currency: 'USD', standardTimeBR: '', currency: 'USD', overtimeBR: '', currency: 'USD' }] }]
+            jobDetails: [{ jobTitle: '', reqId: '', talents: [{ contractDuration: '', billRate: '', currency: 'USD', standardTimeBR: '', overtimeBR: '' }] }]
         });
         setCheckedTalents({});
         setIsViewMode(false);
@@ -201,7 +177,6 @@ function App() {
                 {isViewMode ? 'View Details' : 'Purchase Order Form'}
             </h2>
 
-            {/* AJAX-like loading */}
             {loading && (
                 <div className="alert alert-info text-center" role="alert">
                     Saving data...
@@ -211,14 +186,12 @@ function App() {
             <form onSubmit={handleSubmit}>
                 {!isViewMode ? (
                     <>
-                        {/* Client and PO Details */}
                         <ClientDetails
                             formData={formData}
                             handleInputChange={handleInputChange}
                             handleDateChange={handleDateChange}
                         />
 
-                        {/* Job Details */}
                         <JobDetails
                             jobDetails={formData.jobDetails}
                             jobOptions={jobOptions}
@@ -229,7 +202,6 @@ function App() {
                             removeJobDetail={removeJobDetail}
                             checkedTalents={checkedTalents}
                             handleCheckboxChange={handleCheckboxChange}
-                            formData={formData}
                         />
 
                         <div className="d-grid gap-2 d-md-flex justify-content-md-end my-3">
@@ -272,24 +244,21 @@ function App() {
                             <div className="col-md-6">
                                 <strong>PO End Date:</strong> {new Date(formData.poEndDate).toDateString()}
                             </div>
-
                         </div>
                         <div className="row mb-3">
-                                <div className="col-md-6">
-                                    <strong>Budget: </strong>
-                                    {currencySymbols[formData.currency]?.position === 'before' && (
-                                        <span style={{ marginRight: '5px' }}>{currencySymbols[formData.currency].symbol}</span>
-                                    )}
-                                    <span>{formData.budget}</span>
-                                    {currencySymbols[formData.currency]?.position === 'after' && (
-                                        <span style={{ marginLeft: '5px' }}>{currencySymbols[formData.currency].symbol}</span>
-                                    )}
-                                </div>
-
-                        </div>
-
-                        <div className="mb-3">
-                            <strong>Currency:</strong> {formData.currency}
+                            <div className="col-md-6">
+                                <strong>Budget:</strong>
+                                {currencySymbols[formData.currency]?.position === 'before' && (
+                                    <span style={{ marginRight: '5px' }}>{currencySymbols[formData.currency].symbol}</span>
+                                )}
+                                <span>{formData.budget}</span>
+                                {currencySymbols[formData.currency]?.position === 'after' && (
+                                    <span style={{ marginLeft: '5px' }}>{currencySymbols[formData.currency].symbol}</span>
+                                )}
+                            </div>
+                            <div className="col-md-6">
+                                <strong>Currency:</strong> {formData.currency}
+                            </div>
                         </div>
 
                         <h4 className="text-primary mt-5 mb-4">Talent Details</h4>
@@ -352,7 +321,6 @@ function App() {
                             </div>
                         ))}
 
-
                         <div className="d-flex justify-content-end mt-4">
                             <button type="button" className="btn btn-primary" onClick={handleEdit}>Back</button>
                         </div>
@@ -361,9 +329,6 @@ function App() {
             </form>
         </div>
     );
-
-
 }
 
 export default App;
-
