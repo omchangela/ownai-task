@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 
 function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChecked, handleCheckboxChange }) {

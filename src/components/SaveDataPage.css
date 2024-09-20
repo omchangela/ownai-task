@@ -1,0 +1,53 @@
+.saved-data {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+
+.client-details,
+.job-details {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h4, h5 {
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+@media (min-width: 768px) and (max-width: 1012px) {
+    .row {
+        display: flex; 
+        flex-wrap: wrap;
+    }
+
+    .form-group {
+        flex: 0 0 50%; 
+        box-sizing: border-box; 
+        padding: 0 10px; 
+    }
+
+    .saved-data {
+        padding: 15px; 
+    }
+
+    .form-group label {
+        font-size: 14px; 
+    }
+
+    .form-control, .form-select {
+        font-size: 14px; 
+    }
+
+    .btn {
+        width: 100%; 
+    }
+}
+
+
+

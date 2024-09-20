@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ClientDetails from './components/ClientDetails';
 import JobDetails from './components/JobDetails';
+import SavedDataPage from './components/SavedDataPage'; 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const clientJobData = {
@@ -57,6 +58,7 @@ function App() {
     const [isViewMode, setIsViewMode] = useState(false);
     const [checkedTalents, setCheckedTalents] = useState({});
     const [loading, setLoading] = useState(false);
+    const [view, setView] = useState('form'); 
 
     useEffect(() => {
         if (formData.clientName) {
@@ -106,11 +108,13 @@ function App() {
 
     const handleCheckboxChange = (e, jobIndex, talentIndex) => {
         const { checked } = e.target;
-        setCheckedTalents({
-            ...checkedTalents,
+        setCheckedTalents(prev => ({
+            ...prev,
             [`${jobIndex}-${talentIndex}`]: checked
-        });
+        }));
+        console.log('checkedTalents:', { ...checkedTalents, [`${jobIndex}-${talentIndex}`]: checked });
     };
+    
 
     const handleDateChange = (name, value) => {
         const newDate = new Date(value);
@@ -124,7 +128,6 @@ function App() {
             [name]: newDate
         });
     };
-    
 
     const addJobDetail = () => {
         setFormData({
@@ -142,15 +145,37 @@ function App() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+    
+        let isValid = true;
+        formData.jobDetails.forEach((job, jobIndex) => {
+            const selectedTalents = job.talents.filter((_, talentIndex) => checkedTalents[`${jobIndex}-${talentIndex}`]);
+    
+            if (formData.poType === 'Individual PO' && selectedTalents.length !== 1) {
+                alert('For Individual PO, only one talent must be selected.');
+                isValid = false;
+            }
+    
+            if (formData.poType === 'Group PO' && selectedTalents.length < 2) {
+                alert('For Group PO, at least two talents must be selected.');
+                isValid = false;
+            }
+        });
+    
+        if (!isValid) {
+            return;
+        }
+    
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
             setIsViewMode(true);
+            setView('saved');
         }, 1000);
     };
 
     const handleEdit = () => {
         setIsViewMode(false);
+        setView('form'); 
     };
 
     const handleReset = () => {
@@ -173,160 +198,55 @@ function App() {
 
     return (
         <div className="container-fluid">
-            <h2 className="text-center my-5 p-3" style={{ backgroundColor: 'green', color: 'white' }}>
-                {isViewMode ? 'View Details' : 'Purchase Order Form'}
-            </h2>
+            {view === 'form' ? (
+                <>
+                    <h2 className="text-center my-5 p-3" style={{ backgroundColor: 'green', color: 'white' }}>
+                        {isViewMode ? 'View Details' : 'Purchase Order Form'}
+                    </h2>
 
-            {loading && (
-                <div className="alert alert-info text-center" role="alert">
-                    Saving data...
-                </div>
-            )}
+                    {loading && (
+                        <div className="alert alert-info text-center" role="alert">
+                            Saving data...
+                        </div>
+                    )}
 
-            <form onSubmit={handleSubmit}>
-                {!isViewMode ? (
-                    <>
-                        <ClientDetails
-                            formData={formData}
-                            handleInputChange={handleInputChange}
-                            handleDateChange={handleDateChange}
-                        />
+                    <form onSubmit={handleSubmit}>
+                        {!isViewMode ? (
+                            <>
+                                <ClientDetails
+                                    formData={formData}
+                                    handleInputChange={handleInputChange}
+                                    handleDateChange={handleDateChange}
+                                />
 
-                        <JobDetails
-                            jobDetails={formData.jobDetails}
-                            jobOptions={jobOptions}
-                            poType={formData.poType}
-                            handleInputChange={handleInputChange}
-                            handleDateChange={handleDateChange}
-                            addJobDetail={addJobDetail}
-                            removeJobDetail={removeJobDetail}
-                            checkedTalents={checkedTalents}
-                            handleCheckboxChange={handleCheckboxChange}
-                        />
+                                <JobDetails
+                                    jobDetails={formData.jobDetails}
+                                    jobOptions={jobOptions}
+                                    poType={formData.poType}
+                                    handleInputChange={handleInputChange}
+                                    handleDateChange={handleDateChange}
+                                    addJobDetail={addJobDetail}
+                                    removeJobDetail={removeJobDetail}
+                                    checkedTalents={checkedTalents}
+                                    handleCheckboxChange={handleCheckboxChange}
+                                />
 
-                        <div className="d-grid gap-2 d-md-flex justify-content-md-end my-3">
-                            <button type="submit" className="btn btn-outline-dark rounded-pill me-2" disabled={loading}>
-                                {loading ? 'Saving...' : 'Save'}
-                            </button>
-                            <button type="button" className="btn btn-light btn-outline-dark rounded-pill" onClick={handleReset}>
-                                Reset
-                            </button>
-                        </div>
-                    </>
-                ) : (
-                    <div className="bg-light p-4 rounded shadow-sm">
-                        <h4 className="text-primary mb-4">Client & Purchase Order Details</h4>
-                        <div className="row mb-3">
-                            <div className="col-md-6">
-                                <strong>Client Name:</strong> {formData.clientName}
-                            </div>
-                            <div className="col-md-6">
-                                <strong>PO Type:</strong> {formData.poType}
-                            </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-md-6">
-                                <strong>PO Number:</strong> {formData.poNumber}
-                            </div>
-                            <div className="col-md-6">
-                                <strong>Received On:</strong> {new Date(formData.receivedOn).toDateString()}
-                            </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-md-6">
-                                <strong>Received From:</strong> {formData.receivedFromName} ({formData.receivedFromEmail})
-                            </div>
-                            <div className="col-md-6">
-                                <strong>PO Start Date:</strong> {new Date(formData.poStartDate).toDateString()}
-                            </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-md-6">
-                                <strong>PO End Date:</strong> {new Date(formData.poEndDate).toDateString()}
-                            </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-md-6">
-                                <strong>Budget:</strong>
-                                {currencySymbols[formData.currency]?.position === 'before' && (
-                                    <span style={{ marginRight: '5px' }}>{currencySymbols[formData.currency].symbol}</span>
-                                )}
-                                <span>{formData.budget}</span>
-                                {currencySymbols[formData.currency]?.position === 'after' && (
-                                    <span style={{ marginLeft: '5px' }}>{currencySymbols[formData.currency].symbol}</span>
-                                )}
-                            </div>
-                            <div className="col-md-6">
-                                <strong>Currency:</strong> {formData.currency}
-                            </div>
-                        </div>
-
-                        <h4 className="text-primary mt-5 mb-4">Talent Details</h4>
-                        {formData.jobDetails.map((job, jobIndex) => (
-                            <div key={jobIndex} className="card my-2 shadow-sm border-0">
-                                <div className="card-body">
-                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 className="card-title text-info">Job Detail #{jobIndex + 1}</h5>
-                                    </div>
-                                    <p><strong>Job Title:</strong> <span className="text-muted">{job.jobTitle}</span></p>
-                                    <p><strong>REQ ID:</strong> <span className="text-muted">{job.reqId}</span></p>
-
-                                    <h6 className="mt-4 mb-3 text-dark border-bottom pb-2">Talents</h6>
-                                    {job.talents.map((talent, talentIndex) => (
-                                        checkedTalents[`${jobIndex}-${talentIndex}`] && (
-                                            <div key={talentIndex} className="mb-4">
-                                                <strong className="d-block mb-2">{talent.name}</strong>
-                                                <div className="bg-light p-3 rounded">
-                                                    <ul className="list-unstyled mb-0">
-                                                        <li>
-                                                            <strong>Contract Duration:</strong>
-                                                            <span className="text-muted"> {talent.contractDuration}</span>
-                                                        </li>
-                                                        <li>
-                                                            <strong>Bill Rate:</strong>
-                                                            {currencySymbols[talent.currency]?.position === 'before' && (
-                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
-                                                            )}
-                                                            <span className="text-muted"> {talent.billRate}</span>
-                                                            {currencySymbols[talent.currency]?.position === 'after' && (
-                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
-                                                            )}
-                                                        </li>
-                                                        <li>
-                                                            <strong>Standard Time Bill Rate:</strong>
-                                                            {currencySymbols[talent.currency]?.position === 'before' && (
-                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
-                                                            )}
-                                                            <span className="text-muted"> {talent.standardTimeBR}</span>
-                                                            {currencySymbols[talent.currency]?.position === 'after' && (
-                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
-                                                            )}
-                                                        </li>
-                                                        <li>
-                                                            <strong>Overtime Bill Rate:</strong>
-                                                            {currencySymbols[talent.currency]?.position === 'before' && (
-                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
-                                                            )}
-                                                            <span className="text-muted"> {talent.overtimeBR}</span>
-                                                            {currencySymbols[talent.currency]?.position === 'after' && (
-                                                                <span className="text-muted"> {currencySymbols[talent.currency].symbol}</span>
-                                                            )}
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        )
-                                    ))}
+                                <div className="d-grid gap-2 d-md-flex justify-content-md-end my-3">
+                                    <button type="submit" className="btn btn-primary me-md-2">Submit</button>
+                                    <button type="button" className="btn btn-secondary" onClick={handleReset}>Reset</button>
                                 </div>
+                            </>
+                        ) : (
+                            <div className="d-flex justify-content-end mt-4">
+                                <button type="button" className="btn btn-primary" onClick={handleEdit}>Edit</button>
+                                <button type="button" className="btn btn-secondary" onClick={() => setView('saved')}>View Saved Data</button>
                             </div>
-                        ))}
-
-                        <div className="d-flex justify-content-end mt-4">
-                            <button type="button" className="btn btn-primary" onClick={handleEdit}>Back</button>
-                        </div>
-                    </div>
-                )}
-            </form>
+                        )}
+                    </form>
+                </>
+            ) : (
+                <SavedDataPage formData={formData} checkedTalents={checkedTalents} />
+            )}
         </div>
     );
 }

@@ -83,7 +83,7 @@ function ClientDetails({ formData, handleInputChange, handleDateChange }) {
                 <div className="col-12 col-md-6 col-lg-2">
                     <div className="mb-2">
                         <label>Email ID</label>
-                        <input type="email" placeholder="Received From Email ID" className="form-control" name="receivedFromEmail" onChange={handleInputChange} value={formData.receivedFromEmail} />
+                        <input type="email" placeholder="Received From Email ID" className="form-control" name="receivedFromEmail" required onChange={handleInputChange} value={formData.receivedFromEmail} />
                     </div>
                 </div>
                 <div className="col-12 col-md-6 col-lg-2">
