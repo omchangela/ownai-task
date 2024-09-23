@@ -2,29 +2,47 @@ import React, { useState } from 'react';
 import TalentDetails from './TalentDetails';
 
 function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobDetail, removeJobDetail, checkedTalents, handleCheckboxChange }) {
-    const [showModal, setShowModal] = useState(false); 
-    const [jobToDelete, setJobToDelete] = useState(null); 
+    const [showModal, setShowModal] = useState(false);
+    const [jobToDelete, setJobToDelete] = useState(null);
+    const [jobErrors, setJobErrors] = useState({});
 
     const handleDeleteClick = (jobIndex) => {
         setJobToDelete(jobIndex);
-        setShowModal(true); 
+        setShowModal(true);
     };
 
     const confirmDelete = () => {
         if (jobToDelete !== null) {
             removeJobDetail(jobToDelete);
         }
-        setShowModal(false); 
+        setShowModal(false);
     };
 
     const handleRemoveJobTitle = (jobIndex) => {
         handleInputChange({ target: { name: 'jobTitle', value: '' } }, jobIndex);
     };
 
+    const validateJobTitle = (value, jobIndex) => {
+        setJobErrors(prev => {
+            const errors = { ...prev };
+            if (!value) {
+                errors[jobIndex] = "Job Title is required.";
+            } else {
+                delete errors[jobIndex];
+            }
+            return errors;
+        });
+    };
+
+    const handleJobTitleChange = (e, jobIndex) => {
+        handleInputChange(e, jobIndex);
+        validateJobTitle(e.target.value, jobIndex);
+    };
+
     return (
         <div>
             <div className="row align-items-center my-3 bg-light text-dark">
-                <div className="col mx-3">
+                <div className="col-md-6 mx-3">
                     <h2>Talent Details</h2>
                 </div>
                 <div className="col text-end">
@@ -46,8 +64,8 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                     <div className="input-container">
                                         <select
                                             name="jobTitle"
-                                            className="form-select"
-                                            onChange={(e) => handleInputChange(e, jobIndex)}
+                                            className={`form-select ${jobErrors[jobIndex] ? 'is-invalid' : ''}`}
+                                            onChange={(e) => handleJobTitleChange(e, jobIndex)}
                                             value={job.jobTitle}
                                         >
                                             <option value="">Select Job Title</option>
@@ -67,6 +85,7 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                             </button>
                                         )}
                                     </div>
+                                    {jobErrors[jobIndex] && <div className="invalid-feedback">{jobErrors[jobIndex]}</div>}
                                 </div>
                             </div>
                             <div className="col-md-3">
@@ -92,7 +111,7 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
                                             fontSize: '1.5rem',
                                             marginRight: '10px'
                                         }}
-                                        onClick={() => handleDeleteClick(jobIndex)}  
+                                        onClick={() => handleDeleteClick(jobIndex)}
                                     ></i>
                                 )}
                             </div>

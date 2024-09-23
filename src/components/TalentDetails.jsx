@@ -1,15 +1,79 @@
-
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChecked, handleCheckboxChange }) {
+    const [currencyError, setCurrencyError] = useState('');
+    const [contractDurationError, setContractDurationError] = useState('');
+    const [billRateError, setBillRateError] = useState('');
+    const [standardTimeBRError, setStandardTimeBRError] = useState('');
+    const [overtimeBRError, setOvertimeBRError] = useState('');
+
+    const validateFields = () => {
+        let isValid = true;
+
+        if (isChecked && !talent.currency) {
+            setCurrencyError('Currency is required.');
+            isValid = false;
+        } else {
+            setCurrencyError('');
+        }
+
+        if (isChecked && !talent.contractDuration) {
+            setContractDurationError('Contract Duration is required.');
+            isValid = false;
+        } else {
+            setContractDurationError('');
+        }
+
+        if (isChecked && !talent.billRate) {
+            setBillRateError('Bill Rate is required.');
+            isValid = false;
+        } else if (talent.billRate < 0) {
+            setBillRateError('Bill Rate cannot be less then 0.');
+            isValid = false;
+        } else {
+            setBillRateError('');
+        }
+
+        if (isChecked && !talent.standardTimeBR) {
+            setStandardTimeBRError('Standard Time BR is required.');
+            isValid = false;
+        } else if (talent.standardTimeBR < 0) {
+            setStandardTimeBRError('Standard Time BR cannot be less then 0.');
+            isValid = false;
+        } else {
+            setStandardTimeBRError('');
+        }
+
+        if (isChecked && !talent.overtimeBR) {
+            setOvertimeBRError('Overtime BR is required.');
+            isValid = false;
+        } else if (talent.overtimeBR < 0) {
+            setOvertimeBRError('Overtime BR cannot be less then 0.');
+            isValid = false;
+        } else {
+            setOvertimeBRError('');
+        }
+
+        return isValid;
+    };
+
     const handleChange = (e) => {
         handleInputChange(e, jobIndex, talentIndex);
+        validateFields(); 
     };
 
     const handleRemoveCurrency = (e) => {
         handleInputChange({ target: { name: 'currency', value: '' } }, jobIndex, talentIndex);
     };
+
+    const handleCurrencyChange = (e) => {
+        handleChange(e);
+        validateFields(); 
+    };
+
+    useEffect(() => {
+        validateFields(); 
+    }, [talent]); 
 
     return (
         <div className="mb-3">
@@ -34,13 +98,14 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                 <label>Contract Duration</label>
                                 <input
                                     type="text"
-                                    className="form-control"
+                                    className={`form-control ${contractDurationError ? 'is-invalid' : ''}`}
                                     name="contractDuration"
                                     placeholder="Contract Duration"
                                     value={isChecked ? talent.contractDuration : ''}
                                     onChange={handleChange}
                                     disabled={!isChecked}
                                 />
+                                {contractDurationError && <div className="invalid-feedback">{contractDurationError}</div>}
                             </div>
                         </div>
 
@@ -50,7 +115,7 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                 <div className="input-group">
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className={`form-control ${billRateError ? 'is-invalid' : ''}`}
                                         name="billRate"
                                         placeholder="Bill Rate"
                                         value={isChecked ? talent.billRate : ''}
@@ -58,6 +123,7 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                         disabled={!isChecked}
                                     />
                                     <span className="input-group-text">/hr</span>
+                                    {billRateError && <div className="invalid-feedback">{billRateError}</div>}
                                 </div>
                             </div>
                         </div>
@@ -68,9 +134,9 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                 <div className="input-container">
                                     <select
                                         name="currency"
-                                        className="form-select"
+                                        className={`form-select ${currencyError ? 'is-invalid' : ''}`}
                                         value={isChecked ? talent.currency : ''}
-                                        onChange={handleChange}
+                                        onChange={handleCurrencyChange}
                                         disabled={!isChecked}
                                         required
                                     >
@@ -88,6 +154,7 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                             &times;
                                         </button>
                                     )}
+                                    {currencyError && <div className="invalid-feedback">{currencyError}</div>}
                                 </div>
                             </div>
                         </div>
@@ -98,7 +165,7 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                 <div className="input-group">
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className={`form-control ${standardTimeBRError ? 'is-invalid' : ''}`}
                                         name="standardTimeBR"
                                         placeholder="Std. Time BR"
                                         value={isChecked ? talent.standardTimeBR : ''}
@@ -106,23 +173,25 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                         disabled={!isChecked}
                                     />
                                     <span className="input-group-text">/hr</span>
+                                    {standardTimeBRError && <div className="invalid-feedback">{standardTimeBRError}</div>}
                                 </div>
                             </div>
                         </div>
+
                         <div className="col-12 col-md-6 col-lg-2">
                             <div className="mb-2">
                                 <label>Currency<span style={{ color: 'red' }}>*</span></label>
                                 <div className="input-container">
                                     <select
                                         name="currency"
-                                        className="form-select"
+                                        className={`form-select ${currencyError ? 'is-invalid' : ''}`}
                                         value={isChecked ? talent.currency : ''}
-                                        onChange={handleChange}
+                                        onChange={handleCurrencyChange}
                                         disabled={!isChecked}
                                         required
                                     >
                                         <option value="">Select Currency</option>
-                                        <option value="USD">USD</option>
+                                        <option value="USD">USD - Dollars($)</option>
                                         <option value="EUR">Euro</option>
                                         <option value="INR">INR</option>
                                     </select>
@@ -135,6 +204,7 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                             &times;
                                         </button>
                                     )}
+                                    {currencyError && <div className="invalid-feedback">{currencyError}</div>}
                                 </div>
                             </div>
                         </div>
@@ -145,7 +215,7 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                 <div className="input-group">
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className={`form-control ${overtimeBRError ? 'is-invalid' : ''}`}
                                         name="overtimeBR"
                                         placeholder="Overtime BR"
                                         value={isChecked ? talent.overtimeBR : ''}
@@ -153,23 +223,25 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                         disabled={!isChecked}
                                     />
                                     <span className="input-group-text">/hr</span>
+                                    {overtimeBRError && <div className="invalid-feedback">{overtimeBRError}</div>}
                                 </div>
                             </div>
                         </div>
+
                         <div className="col-12 col-md-6 col-lg-2">
                             <div className="mb-2">
                                 <label>Currency<span style={{ color: 'red' }}>*</span></label>
                                 <div className="input-container">
                                     <select
                                         name="currency"
-                                        className="form-select"
+                                        className={`form-select ${currencyError ? 'is-invalid' : ''}`}
                                         value={isChecked ? talent.currency : ''}
-                                        onChange={handleChange}
+                                        onChange={handleCurrencyChange}
                                         disabled={!isChecked}
                                         required
                                     >
                                         <option value="">Select Currency</option>
-                                        <option value="USD">USD</option>
+                                        <option value="USD">USD - Dollars($)</option>
                                         <option value="EUR">Euro</option>
                                         <option value="INR">INR</option>
                                     </select>
@@ -182,6 +254,7 @@ function TalentDetails({ talent, talentIndex, jobIndex, handleInputChange, isChe
                                             &times;
                                         </button>
                                     )}
+                                    {currencyError && <div className="invalid-feedback">{currencyError}</div>}
                                 </div>
                             </div>
                         </div>
