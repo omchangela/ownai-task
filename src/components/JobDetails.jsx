@@ -42,17 +42,23 @@ function JobDetails({ jobDetails, jobOptions, poType, handleInputChange, addJobD
     return (
         <div>
             <div className="row align-items-center my-3 bg-light text-dark">
-                <div className="col-md-6 mx-3">
-                    <h2>Talent Details</h2>
-                </div>
-                <div className="col text-end">
-                    {poType === 'Group PO' && (
-                        <button type="button" className="btn border rounded-pill" onClick={addJobDetail}>
-                            + Add Another
-                        </button>
-                    )}
-                </div>
-            </div>
+    <div className="col-6 col-md-6 mx-3">
+        <h2 className="text-start text-md-start">Talent Details</h2>
+    </div>
+    <div className="col text-end text-md-end mt-3 mt-md-0">
+        {poType === 'Group PO' && (
+            <button
+                type="button"
+                className="btn border rounded-pill px-3 py-2"
+                style={{ fontSize: '14px' }}
+                onClick={addJobDetail}
+            >
+                + Add Another
+            </button>
+        )}
+    </div>
+</div>
+
 
             {jobDetails.map((job, jobIndex) => (
                 <div key={jobIndex} className="card my-2">
